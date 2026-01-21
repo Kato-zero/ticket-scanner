@@ -1,223 +1,1859 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Weekly Subscription Tracker</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    body { font-family: Arial, sans-serif; background: #f4f6f9; margin: 0; padding: 20px; }
-    h1 { text-align: center; color: #2563eb; }
-    .container { max-width: 850px; margin: auto; background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-    input, select, button { padding: 10px; margin: 5px 0; width: 100%; border-radius: 6px; border: 1px solid #ccc; font-size: 1rem; }
-    button { background: #2563eb; color: #fff; border: none; cursor: pointer; font-size: 1rem; transition: background 0.2s; }
-    button:hover { background: #1d4ed8; }
-    #search { margin: 15px 0; }
-    .exp-list { list-style: none; padding: 0; margin: 0; }
-    .exp-item { background: #e6ffe6; margin-bottom: 10px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); overflow: hidden; transition: background 0.2s; }
-    .exp-item.inactive { background: #ffe5e5; }
-    .exp-header { cursor: pointer; padding: 15px; font-weight: bold; font-size: 1.05rem; color: #2563eb; display: flex; align-items: center; justify-content: space-between; }
-    .exp-header .status { font-size: 0.9rem; padding: 2px 8px; border-radius: 8px; }
-    .status.active { background: #c8facc; color: #2e7d32; }
-    .status.inactive { background: #ffd4d4; color: #d32f2f; }
-    .exp-content { display: none; padding: 12px 18px 16px; border-top: 1px solid #ddd; font-size: 0.95rem; background: #fff; animation: fadeIn 0.2s; }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    .btn-small { padding: 5px 10px; border-radius: 4px; font-size: 0.85rem; cursor: pointer; margin: 2px; }
-    .btn-delete { background: #e53935; color: #fff; border: none; }
-    .btn-delete:hover { background: #c62828; }
-    .btn-renew { background: #43a047; color: #fff; border: none; }
-    .btn-renew:hover { background: #2e7d32; }
-    .btn-edit-missing { background: #ff9800; color: #fff; border: none; }
-    .btn-edit-missing:hover { background: #e68900; }
-    /* Modal styles */
-    #editModal {
-      display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-      background: rgba(0,0,0,0.35); z-index: 1000; align-items: center; justify-content: center;
-    }
-    #editModal .modal-content {
-      background: #fff; border-radius: 10px; max-width: 350px; margin: auto; padding: 20px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.13);
-    }
-    #editModal h2 { margin-top: 0; color: #2563eb; }
-    #editModal input, #editModal select, #editModal button { margin-bottom: 8px; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#4CAF50">
+    <meta name="description" content="Professional QR Ticket Validation System for Events">
+    <title>QR Ticket Validator PWA</title>
+    
+    <!-- PWA Manifest (Inline) -->
+    <link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22QR%20Ticket%20Validator%22%2C%22short_name%22%3A%22Ticket%20Scan%22%2C%22description%22%3A%22Professional%20Event%20Ticket%20Scanner%22%2C%22start_url%22%3A%22.%2F%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%234CAF50%22%2C%22theme_color%22%3A%22%234CAF50%22%2C%22orientation%22%3A%22any%22%2C%22scope%22%3A%22.%2F%22%2C%22categories%22%3A%5B%22productivity%22%2C%22utilities%22%5D%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Crect%20width%3D'100'%20height%3D'100'%20rx%3D'20'%20fill%3D'%234CAF50'%2F%3E%3Ctext%20x%3D'50'%20y%3D'70'%20font-family%3D'Arial'%20font-size%3D'60'%20text-anchor%3D'middle'%20fill%3D'white'%3E%F0%9F%93%9B%3C%2Ftext%3E%3C%2Fsvg%3E%22%2C%22sizes%22%3A%22any%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%2C%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20192%20192'%3E%3Crect%20width%3D'192'%20height%3D'192'%20rx%3D'48'%20fill%3D'%234CAF50'%2F%3E%3Ctext%20x%3D'96'%20y%3D'135'%20font-family%3D'Arial'%20font-size%3D'100'%20text-anchor%3D'middle'%20fill%3D'white'%3E%F0%9F%93%9B%3C%2Ftext%3E%3C%2Fsvg%3E%22%2C%22sizes%22%3A%22192x192%22%7D%2C%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20512%20512'%3E%3Crect%20width%3D'512'%20height%3D'512'%20rx%3D'128'%20fill%3D'%234CAF50'%2F%3E%3Ctext%20x%3D'256'%20y%3D'360'%20font-family%3D'Arial'%20font-size%3D'250'%20text-anchor%3D'middle'%20fill%3D'white'%3E%F0%9F%93%9B%3C%2Ftext%3E%3C%2Fsvg%3E%22%2C%22sizes%22%3A%22512x512%22%7D%5D%7D">
+    
+    <!-- Apple Touch Icon -->
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%234CAF50'/%3E%3Ctext x='50' y='70' font-family='Arial' font-size='60' text-anchor='middle' fill='white'%3E%F0%9F%93%9B%3C/text%3E%3C/svg%3E">
+    
+    <style>
+        /* CSS Variables for PWA */
+        :root {
+            --primary-color: #4CAF50;
+            --primary-dark: #45a049;
+            --secondary-color: #6c757d;
+            --accent-color: #2196F3;
+            --danger-color: #dc3545;
+            --warning-color: #ffc107;
+            --success-color: #28a745;
+            --text-color: #333;
+            --bg-color: #ffffff;
+            --surface-color: #f8f9fa;
+            --border-color: #e9ecef;
+        }
+        
+        /* Install Prompt */
+        #installPrompt {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: var(--primary-color);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            z-index: 10000;
+            display: none;
+            animation: slideUp 0.5s ease;
+            backdrop-filter: blur(10px);
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.95), rgba(69, 160, 73, 0.95));
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(100px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .install-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .install-icon {
+            font-size: 2rem;
+            flex-shrink: 0;
+        }
+        
+        .install-text {
+            flex: 1;
+        }
+        
+        .install-text h3 {
+            margin: 0 0 5px 0;
+            font-size: 1.1rem;
+        }
+        
+        .install-text p {
+            margin: 0;
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .install-buttons {
+            display: flex;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+        
+        .install-btn {
+            padding: 8px 15px;
+            border: 2px solid white;
+            background: transparent;
+            color: white;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .install-btn:hover {
+            background: white;
+            color: var(--primary-color);
+        }
+        
+        .install-btn.secondary {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .pwa-status {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: var(--primary-color);
+            z-index: 1000;
+            display: none;
+            border: 1px solid rgba(76, 175, 80, 0.2);
+        }
+        
+        /* PWA-specific styles */
+        @media (display-mode: standalone) {
+            body {
+                padding-top: env(safe-area-inset-top);
+                padding-bottom: env(safe-area-inset-bottom);
+                padding-left: env(safe-area-inset-left);
+                padding-right: env(safe-area-inset-right);
+            }
+            
+            .pwa-status {
+                display: block;
+                background: var(--success-color);
+                color: white;
+            }
+            
+            .install-prompt-btn {
+                display: none !important;
+            }
+        }
+        
+        @media (display-mode: fullscreen) {
+            .pwa-status {
+                display: block;
+                background: var(--accent-color);
+                color: white;
+            }
+        }
+        
+        /* Offline Indicator */
+        #offlineIndicator {
+            position: fixed;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--warning-color);
+            color: #212529;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            z-index: 1000;
+            display: none;
+            animation: slideDown 0.3s ease;
+            box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+        }
+        
+        @keyframes slideDown {
+            from { transform: translate(-50%, -50px); opacity: 0; }
+            to { transform: translate(-50%, 0); opacity: 1; }
+        }
+        
+        /* Install Button in Header */
+        .install-prompt-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: none;
+        }
+        
+        .install-prompt-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        /* Rest of your existing CSS remains the same, with CSS variables */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--text-color);
+        }
+
+        .app-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--bg-color);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: calc(100vh - 40px);
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        main {
+            display: flex;
+            flex: 1;
+            padding: 0;
+        }
+
+        @media (max-width: 900px) {
+            main {
+                flex-direction: column;
+            }
+        }
+
+        /* Admin Panel */
+        .admin-panel {
+            flex: 1;
+            padding: 30px;
+            background: var(--surface-color);
+            border-right: 2px solid var(--border-color);
+            min-width: 300px;
+        }
+
+        .admin-panel h2 {
+            color: #2c3e50;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--primary-color);
+            font-size: 1.8rem;
+        }
+
+        .ticket-controls {
+            background: var(--bg-color);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+
+        .ticket-controls h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .data-format-info {
+            background: #e8f4fd;
+            border-left: 4px solid var(--accent-color);
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .data-format-info h4 {
+            color: #1565C0;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+
+        .format-example {
+            background: var(--surface-color);
+            padding: 10px;
+            border-radius: 5px;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 12px;
+            margin-top: 10px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            border: 1px solid var(--border-color);
+        }
+
+        .textarea-container {
+            margin-bottom: 20px;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 14px;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        button {
+            padding: 15px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--secondary-color), #5a6268);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108, 117, 125, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger-color), #c82333);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
+        }
+
+        .stats-card {
+            background: var(--bg-color);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            text-align: center;
+        }
+
+        .stat-item {
+            padding: 15px;
+            border-radius: 10px;
+            background: var(--surface-color);
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--secondary-color);
+            font-weight: 600;
+        }
+
+        .total-tickets .stat-value { color: var(--accent-color); }
+        .used-tickets .stat-value { color: var(--danger-color); }
+        .available-tickets .stat-value { color: var(--success-color); }
+
+        /* Validation Panel */
+        .validation-panel {
+            flex: 2;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .validation-panel h2 {
+            color: #2c3e50;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--primary-color);
+            font-size: 1.8rem;
+        }
+
+        .camera-container {
+            flex: 1;
+            background: #000;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 30px;
+            position: relative;
+            min-height: 400px;
+        }
+
+        #qr-reader {
+            width: 100%;
+            height: 100%;
+        }
+
+        .camera-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .scan-box {
+            width: 250px;
+            height: 250px;
+            border: 3px solid var(--primary-color);
+            border-radius: 15px;
+            position: relative;
+        }
+
+        .scan-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--primary-color);
+            animation: scanLine 2s linear infinite;
+        }
+
+        @keyframes scanLine {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(246px); }
+        }
+
+        .camera-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .camera-btn {
+            flex: 1;
+            padding: 12px;
+            font-size: 0.9rem;
+        }
+
+        /* Validation Result */
+        .validation-result {
+            background: var(--bg-color);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+
+        .result-content {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .result-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            animation: popIn 0.5s ease;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .result-text {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .result-subtext {
+            font-size: 1.2rem;
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+        }
+
+        .ticket-details {
+            background: var(--surface-color);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 2px dashed var(--border-color);
+            text-align: left;
+        }
+
+        .ticket-field {
+            display: flex;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .ticket-field:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .field-label {
+            font-weight: 600;
+            min-width: 150px;
+            color: #495057;
+        }
+
+        .field-value {
+            flex: 1;
+            color: #212529;
+        }
+
+        .ticket-id-badge {
+            background: var(--accent-color);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 1.1rem;
+            margin: 10px 0;
+            display: inline-block;
+        }
+
+        /* Status Colors */
+        .status-valid {
+            color: var(--success-color);
+            background: rgba(40, 167, 69, 0.1);
+            border: 2px solid var(--success-color);
+        }
+
+        .status-invalid {
+            color: var(--danger-color);
+            background: rgba(220, 53, 69, 0.1);
+            border: 2px solid var(--danger-color);
+        }
+
+        .status-used {
+            color: var(--warning-color);
+            background: rgba(255, 193, 7, 0.1);
+            border: 2px solid var(--warning-color);
+        }
+
+        .status-idle {
+            color: var(--secondary-color);
+            background: var(--surface-color);
+            border: 2px solid var(--border-color);
+        }
+
+        .scan-history {
+            margin-top: 30px;
+            background: var(--surface-color);
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        .scan-history h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        #scanLog {
+            max-height: 150px;
+            overflow-y: auto;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 12px;
+        }
+
+        .log-entry {
+            padding: 8px 12px;
+            margin-bottom: 5px;
+            border-radius: 5px;
+            background: var(--bg-color);
+            border-left: 4px solid var(--secondary-color);
+        }
+
+        .log-entry.valid { border-left-color: var(--success-color); }
+        .log-entry.invalid { border-left-color: var(--danger-color); }
+        .log-entry.used { border-left-color: var(--warning-color); }
+
+        footer {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        /* Loading State */
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            display: none;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Toast Notifications */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: #333;
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success { background: var(--success-color); }
+        .toast.error { background: var(--danger-color); }
+        .toast.warning { background: var(--warning-color); color: #212529; }
+
+        /* Mobile Optimizations */
+        @media (max-width: 768px) {
+            h1 { font-size: 2rem; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .button-group { grid-template-columns: 1fr; }
+            .scan-box { width: 200px; height: 200px; }
+            .result-text { font-size: 2rem; }
+            .validation-panel, .admin-panel { padding: 20px; }
+            .field-label { min-width: 120px; }
+            
+            #installPrompt {
+                left: 10px;
+                right: 10px;
+                bottom: 10px;
+            }
+        }
+        
+        /* PWA Fullscreen Mode */
+        @media (display-mode: fullscreen) {
+            body {
+                padding: 0;
+            }
+            
+            .app-container {
+                border-radius: 0;
+                min-height: 100vh;
+                max-width: none;
+                margin: 0;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Weekly Subscription Tracker</h1>
-
-    <input type="text" id="name" placeholder="Name (optional)">
-    <input type="tel" id="phone" placeholder="Phone Number">
-    <input type="number" id="amount" placeholder="Amount Paid">
-    <select id="clientType">
-      <option value="Client">Client</option>
-      <option value="Not Mine">Not Mine</option>
-    </select>
-    <input type="date" id="startDate">
-    <button onclick="addSubscription()">Add Subscription</button>
-
-    <input type="text" id="search" placeholder="Search by phone number..." onkeyup="searchSubscriptions()">
-
-    <button onclick="findAndEditMissingName()" class="btn-edit-missing" style="width:100%;margin-bottom:12px;">
-      Re-edit Missing Name by Phone
-    </button>
-
-    <ul id="subList" class="exp-list"></ul>
-  </div>
-
-  <!-- Edit Modal -->
-  <div id="editModal">
-    <div class="modal-content">
-      <h2>Edit & Renew</h2>
-      <input type="text" id="editName" placeholder="Name">
-      <input type="tel" id="editPhone" placeholder="Phone Number">
-      <input type="number" id="editAmount" placeholder="Amount Paid">
-      <select id="editClientType">
-        <option value="Client">Client</option>
-        <option value="Not Mine">Not Mine</option>
-      </select>
-      <button onclick="confirmEditRenew()">Save & Renew</button>
-      <button onclick="closeEditModal()" style="background:#eee;color:#333;">Cancel</button>
+    <!-- PWA Status Indicator -->
+    <div class="pwa-status" id="pwaStatus">📱 App Installed</div>
+    
+    <!-- Offline Indicator -->
+    <div id="offlineIndicator">📡 You're offline - App still works!</div>
+    
+    <!-- Install Prompt -->
+    <div id="installPrompt">
+        <div class="install-content">
+            <div class="install-icon">📱</div>
+            <div class="install-text">
+                <h3>Install Ticket Validator App</h3>
+                <p>Get faster access and work offline</p>
+            </div>
+            <div class="install-buttons">
+                <button class="install-btn secondary" id="installLater">Later</button>
+                <button class="install-btn" id="installNow">Install</button>
+            </div>
+        </div>
     </div>
-  </div>
 
-  <script>
-    let subscriptions = JSON.parse(localStorage.getItem("subscriptions")) || [];
-    let editIndex = null;
+    <!-- App Container -->
+    <div class="app-container">
+        <header>
+            <button class="install-prompt-btn" id="headerInstallBtn">📲 Install App</button>
+            <h1>🎫 QR Ticket Validator PWA</h1>
+            <p class="subtitle">Event Ticket Scanning & Validation System</p>
+        </header>
 
-    function saveSubscriptions() {
-      localStorage.setItem("subscriptions", JSON.stringify(subscriptions));
-    }
+        <main>
+            <!-- Admin Panel -->
+            <div class="admin-panel">
+                <h2>Admin Controls</h2>
+                
+                <div class="ticket-controls">
+                    <div class="data-format-info">
+                        <h4>📋 Expected Data Format (Tab/Comma Separated):</h4>
+                        <div>Date Time | Name | Email | Phone | Ticket Type | Quantity | Ticket ID | Amount | Event | Time | Date | Venue</div>
+                        <div class="format-example">12/28/2025 21:55:39	Jacob Michelo	jcbmichelo@gmail.com	0979140681	Double : 2 people [ k600]	1	NOL-1766951741348	600	FAMILY MATAZ & a short story	19:30	February 14, 2026.	MKANGO GOLF VIEW</div>
+                        <p style="margin-top: 10px; color: #666; font-size: 0.85rem;">
+                            <strong>Note:</strong> Paste tab-separated data (copied from spreadsheet). Each line becomes one ticket.
+                        </p>
+                    </div>
+                    
+                    <h3>Load Ticket Data</h3>
+                    <div class="textarea-container">
+                        <textarea id="ticketData" placeholder='Paste your tab-separated ticket data here...'></textarea>
+                    </div>
+                    
+                    <div class="button-group">
+                        <button class="btn-primary" id="loadTickets">
+                            📥 Load Tickets
+                        </button>
+                        <button class="btn-secondary" id="mergeTickets">
+                            🔄 Merge Tickets
+                        </button>
+                    </div>
+                    
+                    <div class="button-group">
+                        <button class="btn-secondary" id="exportTickets">
+                            📤 Export Tickets
+                        </button>
+                        <button class="btn-danger" id="clearStorage">
+                            🗑️ Clear All Data
+                        </button>
+                    </div>
+                    
+                    <p style="margin-top: 15px; color: #6c757d; font-size: 0.9rem; text-align: center;">
+                        Load: Overwrites all existing tickets<br>
+                        Merge: Adds new tickets, keeps existing usage data
+                    </p>
+                </div>
 
-    function addSubscription() {
-      const name = document.getElementById("name").value.trim();
-      const phone = document.getElementById("phone").value.trim();
-      const amount = document.getElementById("amount").value.trim();
-      const clientType = document.getElementById("clientType").value;
-      const startDate = document.getElementById("startDate").value;
+                <div class="stats-card">
+                    <h3>Ticket Statistics</h3>
+                    <div class="stats-grid">
+                        <div class="stat-item total-tickets">
+                            <div class="stat-value" id="totalTickets">0</div>
+                            <div class="stat-label">Total Tickets</div>
+                        </div>
+                        <div class="stat-item used-tickets">
+                            <div class="stat-value" id="usedTickets">0</div>
+                            <div class="stat-label">Used Tickets</div>
+                        </div>
+                        <div class="stat-item available-tickets">
+                            <div class="stat-value" id="availableTickets">0</div>
+                            <div class="stat-label">Available Tickets</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-      if (!phone || !amount || !startDate) {
-        alert("Phone, amount, and start date are required. Name is optional.");
-        return;
-      }
+            <!-- Validation Panel -->
+            <div class="validation-panel">
+                <h2>Ticket Scanner</h2>
+                
+                <div class="camera-controls">
+                    <button class="btn-primary camera-btn" id="startCamera">
+                        📷 Start Camera
+                    </button>
+                    <button class="btn-secondary camera-btn" id="stopCamera" disabled>
+                        ⏹️ Stop Camera
+                    </button>
+                    <button class="btn-secondary camera-btn" id="flipCamera">
+                        🔄 Flip Camera
+                    </button>
+                </div>
 
-      const start = new Date(startDate);
-      const end = new Date(start); end.setDate(start.getDate() + 7);
+                <div class="camera-container">
+                    <div id="qr-reader"></div>
+                    <div class="camera-overlay">
+                        <div class="scan-box"></div>
+                    </div>
+                </div>
 
-      subscriptions.push({
-        name, phone, amount: parseFloat(amount), clientType,
-        start: start.toLocaleDateString(), end: end.toLocaleDateString(),
-        startISO: start.toISOString(), endISO: end.toISOString()
-      });
+                <div class="validation-result status-idle" id="validationResult">
+                    <div class="result-content">
+                        <div class="result-icon" id="resultIcon">📱</div>
+                        <div class="result-text" id="resultText">Ready to Scan</div>
+                        <div class="result-subtext" id="resultSubtext">
+                            Point camera at QR code to validate ticket
+                        </div>
+                        <div id="ticketDetails" style="display: none;">
+                            <div class="ticket-id-badge" id="ticketIdBadge">NOL-0000000000000</div>
+                            <div class="ticket-details" id="ticketInfo">
+                                <!-- Ticket details will be inserted here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-      saveSubscriptions();
-      renderList();
+                <div class="scan-history">
+                    <h3>Recent Scans</h3>
+                    <div id="scanLog">
+                        <!-- Scan history will appear here -->
+                    </div>
+                </div>
+            </div>
+        </main>
 
-      document.getElementById("name").value = "";
-      document.getElementById("phone").value = "";
-      document.getElementById("amount").value = "";
-      document.getElementById("startDate").value = "";
-    }
+        <footer>
+            <p>QR Ticket Validator PWA | Works completely offline | Install for best experience</p>
+        </footer>
+    </div>
 
-    function deleteSubscription(index) {
-      if (!confirm("Are you sure you want to permanently delete this subscription?")) return;
-      subscriptions.splice(index, 1);
-      saveSubscriptions();
-      renderList();
-    }
+    <!-- Loading Overlay -->
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+    </div>
 
-    function openEditModal(index) {
-      editIndex = index;
-      const s = subscriptions[index];
-      document.getElementById("editName").value = s.name || "";
-      document.getElementById("editPhone").value = s.phone || "";
-      document.getElementById("editAmount").value = s.amount || "";
-      document.getElementById("editClientType").value = s.clientType || "Client";
-      document.getElementById("editModal").style.display = "flex";
-    }
+    <!-- Toast Notifications -->
+    <div class="toast" id="toast"></div>
 
-    function closeEditModal() {
-      document.getElementById("editModal").style.display = "none";
-      editIndex = null;
-    }
-
-    function confirmEditRenew() {
-      const name = document.getElementById("editName").value.trim();
-      const phone = document.getElementById("editPhone").value.trim();
-      const amount = document.getElementById("editAmount").value.trim();
-      const clientType = document.getElementById("editClientType").value;
-
-      if (!phone || !amount) { alert("Phone and amount are required."); return; }
-
-      const today = new Date();
-      const end = new Date(today); end.setDate(today.getDate() + 7);
-
-      Object.assign(subscriptions[editIndex], {
-        name, phone, amount: parseFloat(amount), clientType,
-        start: today.toLocaleDateString(), end: end.toLocaleDateString(),
-        startISO: today.toISOString(), endISO: end.toISOString()
-      });
-
-      saveSubscriptions();
-      renderList();
-      closeEditModal();
-    }
-
-    function findAndEditMissingName() {
-      const phone = prompt("Enter client's phone number:");
-      if (!phone) return;
-      const index = subscriptions.findIndex(s => s.phone === phone && !s.name);
-      if (index === -1) { alert("No record found with missing name."); return; }
-      openEditModal(index);
-    }
-
-    function renderList(list = subscriptions) {
-      const ul = document.getElementById("subList"); ul.innerHTML = "";
-      const today = new Date();
-
-      list.forEach((s, i) => {
-        const end = new Date(s.endISO || s.end);
-        const status = today > end ? "inactive" : "active";
-        const statusText = status === "inactive" ? "Inactive" : "Active";
-
-        const li = document.createElement("li");
-        li.className = `exp-item ${status}`;
-
-        const header = document.createElement("div");
-        header.className = "exp-header";
-        header.innerHTML = `
-          <span>${s.name || "<em style='color:red;'>Name Missing</em>"} 
-            <span style="color:#2563eb;font-size:0.9em;margin-left:8px;">${s.phone}</span>
-          </span>
-          <span class="status ${status}">${statusText}</span>
-        `;
-        const content = document.createElement("div");
-        content.className = "exp-content";
-        content.innerHTML = `
-          <div><strong>Phone:</strong> ${s.phone}</div>
-          <div><strong>Amount:</strong> ${s.amount}</div>
-          <div><strong>Client Type:</strong> ${s.clientType}</div>
-          <div><strong>Start:</strong> ${s.start}</div>
-          <div><strong>End:</strong> ${s.end}</div>
-          <div style="margin-top:10px;">
-            <button class="btn-small btn-renew" onclick="openEditModal(${i})">Renew & Edit</button>
-            <button class="btn-small btn-delete" onclick="deleteSubscription(${i})">Delete</button>
-            ${!s.name ? `<button class="btn-small btn-edit-missing" onclick="openEditModal(${i})">Re-edit Name</button>` : ""}
-          </div>
-        `;
-        header.onclick = () => content.style.display = content.style.display === "block" ? "none" : "block";
-
-        li.appendChild(header);
-        li.appendChild(content);
-        ul.appendChild(li);
-      });
-    }
-
-    function searchSubscriptions() {
-      const q = document.getElementById("search").value.trim();
-      renderList(q ? subscriptions.filter(s => s.phone.includes(q)) : subscriptions);
-    }
-
-    renderList();
-  </script>
+    <script>
+        // ==============================================
+        // PWA MANAGER - Handles installation and offline capabilities
+        // ==============================================
+        class PWAManager {
+            constructor() {
+                this.deferredPrompt = null;
+                this.isInstalled = false;
+                this.isStandalone = false;
+                this.isOnline = navigator.onLine;
+                this.init();
+            }
+            
+            init() {
+                this.checkInstallation();
+                this.setupEventListeners();
+                this.setupServiceWorker();
+                this.updateOnlineStatus();
+                this.setupInstallPrompt();
+            }
+            
+            checkInstallation() {
+                // Check if app is running in standalone mode (installed)
+                this.isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
+                                   window.matchMedia('(display-mode: fullscreen)').matches ||
+                                   window.navigator.standalone === true;
+                
+                this.isInstalled = this.isStandalone || 
+                                   localStorage.getItem('pwaInstalled') === 'true';
+                
+                this.updatePWAStatus();
+            }
+            
+            updatePWAStatus() {
+                const statusEl = document.getElementById('pwaStatus');
+                if (this.isStandalone) {
+                    statusEl.textContent = '📱 App Installed';
+                    statusEl.style.display = 'block';
+                    document.getElementById('headerInstallBtn').style.display = 'none';
+                } else if (this.isInstalled) {
+                    statusEl.textContent = '📱 Ready to Install';
+                    statusEl.style.display = 'block';
+                }
+            }
+            
+            setupEventListeners() {
+                // Online/offline detection
+                window.addEventListener('online', () => this.updateOnlineStatus());
+                window.addEventListener('offline', () => this.updateOnlineStatus());
+                
+                // Before install prompt
+                window.addEventListener('beforeinstallprompt', (e) => {
+                    e.preventDefault();
+                    this.deferredPrompt = e;
+                    this.showInstallPrompt();
+                });
+                
+                // App installed
+                window.addEventListener('appinstalled', () => {
+                    this.isInstalled = true;
+                    this.isStandalone = true;
+                    localStorage.setItem('pwaInstalled', 'true');
+                    this.updatePWAStatus();
+                    this.hideInstallPrompt();
+                    this.showToast('App installed successfully!', 'success');
+                    console.log('PWA installed');
+                });
+            }
+            
+            setupServiceWorker() {
+                if ('serviceWorker' in navigator) {
+                    // Create service worker code inline
+                    const swCode = `
+                        const CACHE_NAME = 'ticket-validator-v1.0';
+                        const CACHE_URLS = [
+                            '/',
+                            './index.html'
+                        ];
+                        
+                        // Install event
+                        self.addEventListener('install', event => {
+                            event.waitUntil(
+                                caches.open(CACHE_NAME)
+                                    .then(cache => {
+                                        console.log('Cache opened');
+                                        return cache.addAll(CACHE_URLS);
+                                    })
+                                    .then(() => self.skipWaiting())
+                            );
+                        });
+                        
+                        // Activate event
+                        self.addEventListener('activate', event => {
+                            event.waitUntil(
+                                caches.keys().then(cacheNames => {
+                                    return Promise.all(
+                                        cacheNames.map(cacheName => {
+                                            if (cacheName !== CACHE_NAME) {
+                                                return caches.delete(cacheName);
+                                            }
+                                        })
+                                    );
+                                }).then(() => self.clients.claim())
+                            );
+                        });
+                        
+                        // Fetch event
+                        self.addEventListener('fetch', event => {
+                            // Skip non-GET requests
+                            if (event.request.method !== 'GET') return;
+                            
+                            event.respondWith(
+                                caches.match(event.request)
+                                    .then(response => {
+                                        // Return cached version if found
+                                        if (response) {
+                                            return response;
+                                        }
+                                        
+                                        // Otherwise fetch from network
+                                        return fetch(event.request)
+                                            .then(response => {
+                                                // Don't cache if not a valid response
+                                                if (!response || response.status !== 200 || response.type !== 'basic') {
+                                                    return response;
+                                                }
+                                                
+                                                // Clone response for caching
+                                                const responseToCache = response.clone();
+                                                
+                                                caches.open(CACHE_NAME)
+                                                    .then(cache => {
+                                                        cache.put(event.request, responseToCache);
+                                                    });
+                                                
+                                                return response;
+                                            })
+                                            .catch(() => {
+                                                // For HTML pages, return offline page
+                                                if (event.request.headers.get('accept').includes('text/html')) {
+                                                    return caches.match('/');
+                                                }
+                                                return new Response('Offline', {
+                                                    status: 503,
+                                                    statusText: 'Service Unavailable',
+                                                    headers: new Headers({
+                                                        'Content-Type': 'text/plain'
+                                                    })
+                                                });
+                                            });
+                                    })
+                            );
+                        });
+                        
+                        // Message handling
+                        self.addEventListener('message', event => {
+                            if (event.data && event.data.type === 'CACHE_TICKET_DATA') {
+                                caches.open(CACHE_NAME).then(cache => {
+                                    cache.put('ticket-data', new Response(JSON.stringify(event.data.payload)));
+                                });
+                            }
+                        });
+                    `;
+                    
+                    try {
+                        const blob = new Blob([swCode], { type: 'application/javascript' });
+                        const swURL = URL.createObjectURL(blob);
+                        
+                        navigator.serviceWorker.register(swURL)
+                            .then(registration => {
+                                console.log('Service Worker registered:', registration);
+                                
+                                // Check for updates
+                                registration.addEventListener('updatefound', () => {
+                                    console.log('New service worker found');
+                                    if (confirm('New version available. Update now?')) {
+                                        registration.update();
+                                    }
+                                });
+                            })
+                            .catch(error => {
+                                console.error('Service Worker registration failed:', error);
+                            });
+                    } catch (error) {
+                        console.error('Service Worker setup failed:', error);
+                    }
+                }
+            }
+            
+            updateOnlineStatus() {
+                this.isOnline = navigator.onLine;
+                const offlineIndicator = document.getElementById('offlineIndicator');
+                
+                if (!this.isOnline) {
+                    offlineIndicator.textContent = '📡 You\'re offline - App still works!';
+                    offlineIndicator.style.display = 'block';
+                    this.showToast('Working offline', 'warning');
+                } else {
+                    offlineIndicator.style.display = 'none';
+                }
+            }
+            
+            setupInstallPrompt() {
+                document.getElementById('installNow').addEventListener('click', () => this.installApp());
+                document.getElementById('installLater').addEventListener('click', () => this.hideInstallPrompt());
+                document.getElementById('headerInstallBtn').addEventListener('click', () => this.showInstallPrompt());
+                
+                // Auto-show install prompt after 10 seconds if not installed
+                if (!this.isInstalled) {
+                    setTimeout(() => {
+                        this.showInstallPrompt();
+                    }, 10000);
+                }
+            }
+            
+            showInstallPrompt() {
+                if (this.deferredPrompt && !this.isInstalled && !this.isStandalone) {
+                    const prompt = document.getElementById('installPrompt');
+                    prompt.style.display = 'block';
+                    document.getElementById('headerInstallBtn').style.display = 'block';
+                }
+            }
+            
+            hideInstallPrompt() {
+                document.getElementById('installPrompt').style.display = 'none';
+            }
+            
+            async installApp() {
+                if (!this.deferredPrompt) {
+                    this.showToast('Installation not available', 'error');
+                    return;
+                }
+                
+                try {
+                    this.deferredPrompt.prompt();
+                    const choiceResult = await this.deferredPrompt.userChoice;
+                    
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('User accepted install');
+                        this.isInstalled = true;
+                        localStorage.setItem('pwaInstalled', 'true');
+                        this.showToast('Installing...', 'success');
+                    } else {
+                        console.log('User declined install');
+                        this.showToast('Installation cancelled', 'warning');
+                    }
+                    
+                    this.deferredPrompt = null;
+                    this.hideInstallPrompt();
+                    
+                } catch (error) {
+                    console.error('Installation failed:', error);
+                    this.showToast('Installation failed', 'error');
+                }
+            }
+            
+            showToast(message, type = 'success') {
+                const toast = document.getElementById('toast');
+                toast.textContent = message;
+                toast.className = `toast ${type}`;
+                toast.classList.add('show');
+                
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 3000);
+            }
+        }
+        
+        // ==============================================
+        // TICKET VALIDATION SYSTEM
+        // ==============================================
+        // ... (All your existing TicketManager, QRScannerManager, StorageManager classes remain exactly the same)
+        // Storage Manager
+        class StorageManager {
+            constructor() {
+                this.STORAGE_KEY = 'ticketValidatorData';
+                this.SCAN_HISTORY_KEY = 'ticketScanHistory';
+                this.init();
+            }
+            
+            init() {
+                if (!localStorage.getItem(this.STORAGE_KEY)) {
+                    this.saveTickets([]);
+                }
+                if (!localStorage.getItem(this.SCAN_HISTORY_KEY)) {
+                    this.saveScanHistory([]);
+                }
+            }
+            
+            loadTickets() {
+                try {
+                    const data = localStorage.getItem(this.STORAGE_KEY);
+                    return data ? JSON.parse(data) : [];
+                } catch (e) {
+                    console.error('Error loading tickets:', e);
+                    this.showToast('Error loading tickets', 'error');
+                    return [];
+                }
+            }
+            
+            saveTickets(tickets) {
+                try {
+                    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(tickets));
+                    
+                    // Also cache in service worker for offline access
+                    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+                        navigator.serviceWorker.controller.postMessage({
+                            type: 'CACHE_TICKET_DATA',
+                            payload: tickets
+                        });
+                    }
+                    
+                    return true;
+                } catch (e) {
+                    console.error('Error saving tickets:', e);
+                    this.showToast('Error saving tickets', 'error');
+                    return false;
+                }
+            }
+            
+            loadScanHistory() {
+                try {
+                    const data = localStorage.getItem(this.SCAN_HISTORY_KEY);
+                    return data ? JSON.parse(data) : [];
+                } catch (e) {
+                    console.error('Error loading scan history:', e);
+                    return [];
+                }
+            }
+            
+            saveScanHistory(history) {
+                try {
+                    if (history.length > 50) {
+                        history = history.slice(-50);
+                    }
+                    localStorage.setItem(this.SCAN_HISTORY_KEY, JSON.stringify(history));
+                } catch (e) {
+                    console.error('Error saving scan history:', e);
+                }
+            }
+            
+            clearAllData() {
+                localStorage.removeItem(this.STORAGE_KEY);
+                localStorage.removeItem(this.SCAN_HISTORY_KEY);
+                this.init();
+                this.showToast('All data cleared', 'success');
+            }
+            
+            showToast(message, type = 'success') {
+                const toast = document.getElementById('toast');
+                toast.textContent = message;
+                toast.className = `toast ${type}`;
+                toast.classList.add('show');
+                
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 3000);
+            }
+        }
+        
+        // Ticket Manager
+        class TicketManager {
+            constructor(storageManager) {
+                this.storage = storageManager;
+                this.tickets = this.storage.loadTickets();
+                this.scanHistory = this.storage.loadScanHistory();
+                this.lastScannedTicket = null;
+                this.lastScanTime = 0;
+                this.DEBOUNCE_TIME = 2000;
+                this.updateStats();
+                this.renderScanHistory();
+            }
+            
+            parseTicketData(rawData) {
+                const tickets = [];
+                const lines = rawData.trim().split('\n');
+                
+                lines.forEach((line, index) => {
+                    line = line.trim();
+                    if (!line) return;
+                    
+                    try {
+                        let parts;
+                        if (line.includes('\t')) {
+                            parts = line.split('\t');
+                        } else if (line.includes(',')) {
+                            parts = line.split(',');
+                        } else {
+                            parts = line.split(/\s{2,}/);
+                        }
+                        
+                        parts = parts.map(part => part.trim());
+                        
+                        if (parts.length >= 12) {
+                            const ticket = {
+                                purchaseDateTime: parts[0],
+                                name: parts[1],
+                                email: parts[2],
+                                phone: parts[3],
+                                ticketType: parts[4],
+                                quantity: parseInt(parts[5]) || 1,
+                                id: parts[6].trim(),
+                                amount: parts[7],
+                                event: parts[8],
+                                eventTime: parts[9],
+                                eventDate: parts[10],
+                                venue: parts.slice(11).join(' '),
+                                used: false,
+                                usedAt: null,
+                                scannedBy: null,
+                                scanCount: 0
+                            };
+                            
+                            if (!ticket.displayId) {
+                                ticket.displayId = ticket.id || `TICKET-${Date.now()}-${index}`;
+                            }
+                            
+                            tickets.push(ticket);
+                        } else if (parts.length >= 7) {
+                            const ticket = {
+                                id: parts[6].trim(),
+                                name: parts[1] || 'Unknown',
+                                email: parts[2] || '',
+                                phone: parts[3] || '',
+                                ticketType: parts[4] || 'General',
+                                quantity: parseInt(parts[5]) || 1,
+                                purchaseDateTime: parts[0] || new Date().toLocaleString(),
+                                event: parts[8] || 'Event',
+                                used: false,
+                                usedAt: null
+                            };
+                            tickets.push(ticket);
+                        }
+                    } catch (error) {
+                        console.warn(`Skipping line ${index + 1}: ${error.message}`);
+                    }
+                });
+                
+                return tickets;
+            }
+            
+            updateStats() {
+                const total = this.tickets.length;
+                const used = this.tickets.filter(t => t.used).length;
+                const available = total - used;
+                
+                document.getElementById('totalTickets').textContent = total;
+                document.getElementById('usedTickets').textContent = used;
+                document.getElementById('availableTickets').textContent = available;
+            }
+            
+            validateTicket(ticketId) {
+                const now = Date.now();
+                const timeSinceLastScan = now - this.lastScanTime;
+                
+                if (this.lastScannedTicket === ticketId && timeSinceLastScan < this.DEBOUNCE_TIME) {
+                    return { 
+                        status: 'debounced', 
+                        message: 'Please wait before scanning again' 
+                    };
+                }
+                
+                const ticket = this.tickets.find(t => t.id === ticketId);
+                this.lastScannedTicket = ticketId;
+                this.lastScanTime = now;
+                
+                let result;
+                
+                if (!ticket) {
+                    result = {
+                        status: 'invalid',
+                        icon: '❌',
+                        message: 'INVALID TICKET',
+                        submessage: 'This ticket ID is not in our database',
+                        color: 'status-invalid',
+                        ticket: null
+                    };
+                } else if (ticket.used) {
+                    result = {
+                        status: 'used',
+                        icon: '⚠️',
+                        message: 'ALREADY USED',
+                        submessage: `Scanned ${ticket.usedAt ? 'on ' + new Date(ticket.usedAt).toLocaleString() : 'previously'}`,
+                        color: 'status-used',
+                        ticket: ticket
+                    };
+                    
+                    ticket.scanCount = (ticket.scanCount || 0) + 1;
+                    this.storage.saveTickets(this.tickets);
+                } else {
+                    ticket.used = true;
+                    ticket.usedAt = new Date().toISOString();
+                    ticket.scannedBy = 'System';
+                    ticket.scanCount = 1;
+                    this.storage.saveTickets(this.tickets);
+                    
+                    result = {
+                        status: 'valid',
+                        icon: '✅',
+                        message: 'VALID TICKET',
+                        submessage: 'Access granted',
+                        color: 'status-valid',
+                        ticket: ticket
+                    };
+                }
+                
+                this.addToScanHistory(ticketId, result.status, result.ticket);
+                this.updateStats();
+                
+                return result;
+            }
+            
+            addToScanHistory(ticketId, status, ticket = null) {
+                const scan = {
+                    ticketId,
+                    status,
+                    timestamp: new Date().toLocaleTimeString(),
+                    date: new Date().toLocaleDateString(),
+                    name: ticket?.name || 'Unknown',
+                    ticketType: ticket?.ticketType || 'N/A'
+                };
+                
+                this.scanHistory.unshift(scan);
+                this.storage.saveScanHistory(this.scanHistory);
+                this.renderScanHistory();
+            }
+            
+            renderScanHistory() {
+                const logContainer = document.getElementById('scanLog');
+                logContainer.innerHTML = '';
+                
+                this.scanHistory.forEach(scan => {
+                    const entry = document.createElement('div');
+                    entry.className = `log-entry ${scan.status}`;
+                    entry.textContent = `[${scan.timestamp}] ${scan.ticketId} - ${scan.name} (${scan.ticketType}) - ${scan.status.toUpperCase()}`;
+                    logContainer.appendChild(entry);
+                });
+            }
+            
+            loadNewTickets(rawData) {
+                try {
+                    if (!rawData.trim()) {
+                        throw new Error('Please paste ticket data first');
+                    }
+                    
+                    const newTickets = this.parseTicketData(rawData);
+                    
+                    if (newTickets.length === 0) {
+                        throw new Error('No valid tickets found in the data. Please check format.');
+                    }
+                    
+                    const ids = newTickets.map(t => t.id);
+                    const uniqueIds = new Set(ids);
+                    if (ids.length !== uniqueIds.size) {
+                        const duplicates = ids.filter((id, index) => ids.indexOf(id) !== index);
+                        throw new Error(`Duplicate ticket IDs found: ${duplicates.slice(0, 3).join(', ')}`);
+                    }
+                    
+                    this.tickets = newTickets;
+                    this.storage.saveTickets(this.tickets);
+                    this.updateStats();
+                    this.storage.showToast(`${newTickets.length} tickets loaded successfully`, 'success');
+                    
+                } catch (error) {
+                    console.error('Error loading tickets:', error);
+                    this.storage.showToast(`Error: ${error.message}`, 'error');
+                }
+            }
+            
+            mergeTickets(rawData) {
+                try {
+                    if (!rawData.trim()) {
+                        throw new Error('Please paste ticket data first');
+                    }
+                    
+                    const newTickets = this.parseTicketData(rawData);
+                    
+                    if (newTickets.length === 0) {
+                        throw new Error('No valid tickets found in the data');
+                    }
+                    
+                    const existingTicketsMap = new Map();
+                    this.tickets.forEach(ticket => {
+                        existingTicketsMap.set(ticket.id, ticket);
+                    });
+                    
+                    newTickets.forEach(newTicket => {
+                        if (!newTicket.id) {
+                            return;
+                        }
+                        
+                        if (!existingTicketsMap.has(newTicket.id)) {
+                            existingTicketsMap.set(newTicket.id, newTicket);
+                        } else {
+                            const existing = existingTicketsMap.get(newTicket.id);
+                            if (!existing.used) {
+                                Object.keys(newTicket).forEach(key => {
+                                    if (key !== 'used' && key !== 'usedAt' && key !== 'scannedBy' && key !== 'scanCount') {
+                                        existing[key] = newTicket[key];
+                                    }
+                                });
+                            }
+                        }
+                    });
+                    
+                    this.tickets = Array.from(existingTicketsMap.values());
+                    this.storage.saveTickets(this.tickets);
+                    this.updateStats();
+                    this.storage.showToast(`Merged ${newTickets.length} tickets`, 'success');
+                    
+                } catch (error) {
+                    console.error('Error merging tickets:', error);
+                    this.storage.showToast(`Error: ${error.message}`, 'error');
+                }
+            }
+            
+            exportTickets() {
+                const dataStr = JSON.stringify(this.tickets, null, 2);
+                const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+                
+                const exportFileDefaultName = `ticket-export-${new Date().toISOString().split('T')[0]}.json`;
+                
+                const linkElement = document.createElement('a');
+                linkElement.setAttribute('href', dataUri);
+                linkElement.setAttribute('download', exportFileDefaultName);
+                linkElement.click();
+                
+                this.storage.showToast('Tickets exported successfully', 'success');
+            }
+            
+            getTicketById(ticketId) {
+                return this.tickets.find(t => t.id === ticketId);
+            }
+            
+            renderTicketDetails(ticket) {
+                if (!ticket) return '';
+                
+                return `
+                    <div class="ticket-field">
+                        <span class="field-label">Name:</span>
+                        <span class="field-value">${ticket.name || 'N/A'}</span>
+                    </div>
+                    <div class="ticket-field">
+                        <span class="field-label">Ticket Type:</span>
+                        <span class="field-value">${ticket.ticketType || 'General'}</span>
+                    </div>
+                    <div class="ticket-field">
+                        <span class="field-label">Quantity:</span>
+                        <span class="field-value">${ticket.quantity || 1} person(s)</span>
+                    </div>
+                    <div class="ticket-field">
+                        <span class="field-label">Event:</span>
+                        <span class="field-value">${ticket.event || 'Event'}</span>
+                    </div>
+                    <div class="ticket-field">
+                        <span class="field-label">Date:</span>
+                        <span class="field-value">${ticket.eventDate || 'N/A'}</span>
+                    </div>
+                    <div class="ticket-field">
+                        <span class="field-label">Time:</span>
+                        <span class="field-value">${ticket.eventTime || 'N/A'}</span>
+                    </div>
+                    <div class="ticket-field">
+                        <span class="field-label">Venue:</span>
+                        <span class="field-value">${ticket.venue || 'N/A'}</span>
+                    </div>
+                    <div class="ticket-field">
+                        <span class="field-label">Purchase Date:</span>
+                        <span class="field-value">${ticket.purchaseDateTime || 'N/A'}</span>
+                    </div>
+                `;
+            }
+        }
+        
+        // QR Scanner Manager
+        class QRScannerManager {
+            constructor(ticketManager) {
+                this.ticketManager = ticketManager;
+                this.scanner = null;
+                this.isScanning = false;
+                this.currentCameraId = null;
+                this.cameras = [];
+                this.currentCameraIndex = 0;
+                this.init();
+            }
+            
+            async init() {
+                if (typeof Html5QrcodeScanner === 'undefined') {
+                    await this.loadQRScannerLibrary();
+                }
+                
+                this.setupEventListeners();
+                this.showLoading(false);
+            }
+            
+            async loadQRScannerLibrary() {
+                this.showLoading(true);
+                
+                try {
+                    const script = document.createElement('script');
+                    script.src = 'https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js';
+                    script.onload = () => {
+                        console.log('QR Scanner library loaded');
+                        this.setupScanner();
+                        this.showLoading(false);
+                    };
+                    script.onerror = () => {
+                        console.error('Failed to load QR scanner library');
+                        this.showLoading(false);
+                        this.ticketManager.storage.showToast('Failed to load QR scanner', 'error');
+                    };
+                    document.head.appendChild(script);
+                } catch (error) {
+                    console.error('Error loading QR scanner:', error);
+                    this.showLoading(false);
+                }
+            }
+            
+            showLoading(show) {
+                document.getElementById('loading').style.display = show ? 'flex' : 'none';
+            }
+            
+            setupEventListeners() {
+                document.getElementById('startCamera').addEventListener('click', () => this.startScanner());
+                document.getElementById('stopCamera').addEventListener('click', () => this.stopScanner());
+                document.getElementById('flipCamera').addEventListener('click', () => this.flipCamera());
+            }
+            
+            async setupScanner() {
+                try {
+                    const devices = await Html5Qrcode.getCameras();
+                    this.cameras = devices;
+                    
+                    if (this.cameras.length === 0) {
+                        throw new Error('No cameras found');
+                    }
+                    
+                    this.scanner = new Html5QrcodeScanner(
+                        "qr-reader",
+                        {
+                            fps: 10,
+                            qrbox: { width: 250, height: 250 },
+                            rememberLastUsedCamera: true,
+                            supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA]
+                        },
+                        false
+                    );
+                    
+                } catch (error) {
+                    console.error('Error setting up scanner:', error);
+                    this.ticketManager.storage.showToast('Camera setup failed: ' + error.message, 'error');
+                }
+            }
+            
+            async startScanner() {
+                if (this.isScanning) return;
+                
+                try {
+                    this.showLoading(true);
+                    
+                    if (!this.scanner) {
+                        await this.setupScanner();
+                    }
+                    
+                    this.resetValidationDisplay();
+                    
+                    await this.scanner.render(
+                        (decodedText, decodedResult) => this.onScanSuccess(decodedText, decodedResult),
+                        (errorMessage) => this.onScanError(errorMessage)
+                    );
+                    
+                    this.isScanning = true;
+                    this.updateCameraControls(true);
+                    this.ticketManager.storage.showToast('Camera started', 'success');
+                    
+                } catch (error) {
+                    console.error('Error starting scanner:', error);
+                    this.ticketManager.storage.showToast('Failed to start camera: ' + error.message, 'error');
+                } finally {
+                    this.showLoading(false);
+                }
+            }
+            
+            stopScanner() {
+                if (!this.isScanning || !this.scanner) return;
+                
+                try {
+                    this.scanner.clear();
+                    this.isScanning = false;
+                    this.updateCameraControls(false);
+                    this.ticketManager.storage.showToast('Camera stopped', 'warning');
+                } catch (error) {
+                    console.error('Error stopping scanner:', error);
+                }
+            }
+            
+            flipCamera() {
+                if (!this.isScanning || this.cameras.length < 2) return;
+                
+                this.stopScanner();
+                this.currentCameraIndex = (this.currentCameraIndex + 1) % this.cameras.length;
+                setTimeout(() => this.startScanner(), 500);
+            }
+            
+            updateCameraControls(isScanning) {
+                document.getElementById('startCamera').disabled = isScanning;
+                document.getElementById('stopCamera').disabled = !isScanning;
+            }
+            
+            onScanSuccess(decodedText, decodedResult) {
+                const ticketId = decodedText.trim();
+                const result = this.ticketManager.validateTicket(ticketId);
+                
+                if (result.status === 'debounced') {
+                    this.ticketManager.storage.showToast(result.message, 'warning');
+                    return;
+                }
+                
+                this.updateValidationDisplay(ticketId, result);
+                this.playValidationSound(result.status);
+            }
+            
+            onScanError(errorMessage) {
+                if (!errorMessage.includes('NotFoundException')) {
+                    console.log('Scan error:', errorMessage);
+                }
+            }
+            
+            updateValidationDisplay(ticketId, result) {
+                const resultElement = document.getElementById('validationResult');
+                const iconElement = document.getElementById('resultIcon');
+                const textElement = document.getElementById('resultText');
+                const subtextElement = document.getElementById('resultSubtext');
+                const ticketDetailsElement = document.getElementById('ticketDetails');
+                const ticketIdBadge = document.getElementById('ticketIdBadge');
+                const ticketInfoElement = document.getElementById('ticketInfo');
+                
+                iconElement.textContent = result.icon;
+                textElement.textContent = result.message;
+                subtextElement.textContent = result.submessage;
+                
+                if (result.ticket) {
+                    ticketIdBadge.textContent = ticketId;
+                    ticketInfoElement.innerHTML = this.ticketManager.renderTicketDetails(result.ticket);
+                    ticketDetailsElement.style.display = 'block';
+                } else {
+                    ticketIdBadge.textContent = ticketId;
+                    ticketInfoElement.innerHTML = '<div class="ticket-field"><span class="field-label">Ticket ID:</span><span class="field-value">' + ticketId + '</span></div>';
+                    ticketDetailsElement.style.display = 'block';
+                }
+                
+                resultElement.className = 'validation-result ' + result.color;
+                
+                if (result.status !== 'valid') {
+                    setTimeout(() => this.resetValidationDisplay(), 5000);
+                }
+            }
+            
+            resetValidationDisplay() {
+                const resultElement = document.getElementById('validationResult');
+                const iconElement = document.getElementById('resultIcon');
+                const textElement = document.getElementById('resultText');
+                const subtextElement = document.getElementById('resultSubtext');
+                const ticketDetailsElement = document.getElementById('ticketDetails');
+                
+                iconElement.textContent = '📱';
+                textElement.textContent = 'Ready to Scan';
+                subtextElement.textContent = 'Point camera at QR code to validate ticket';
+                ticketDetailsElement.style.display = 'none';
+                resultElement.className = 'validation-result status-idle';
+            }
+            
+            playValidationSound(status) {
+                try {
+                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    if (status === 'valid') {
+                        oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+                    } else if (status === 'invalid') {
+                        oscillator.frequency.setValueAtTime(400, audioContext.currentTime);
+                    } else {
+                        oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
+                    }
+                    
+                    oscillator.start();
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.1);
+                    oscillator.stop(audioContext.currentTime + 0.1);
+                    
+                } catch (error) {
+                    console.log('Audio not supported:', error);
+                }
+            }
+        }
+        
+        // ==============================================
+        // MAIN APPLICATION INITIALIZATION
+        // ==============================================
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize PWA Manager first
+            const pwaManager = new PWAManager();
+            
+            // Initialize storage manager
+            const storageManager = new StorageManager();
+            
+            // Initialize ticket manager
+            const ticketManager = new TicketManager(storageManager);
+            
+            // Initialize QR scanner manager
+            const qrScanner = new QRScannerManager(ticketManager);
+            
+            // Make managers available globally
+            window.pwaManager = pwaManager;
+            window.ticketManager = ticketManager;
+            window.storageManager = storageManager;
+            window.qrScanner = qrScanner;
+            
+            // Setup UI event listeners
+            setupUIListeners(ticketManager, storageManager);
+            
+            // Auto-load example data if no tickets exist
+            if (ticketManager.tickets.length === 0) {
+                loadExampleData();
+            }
+            
+            console.log('✅ Ticket Validator PWA Ready');
+        });
+        
+        function setupUIListeners(ticketManager, storageManager) {
+            document.getElementById('loadTickets').addEventListener('click', () => {
+                const ticketData = document.getElementById('ticketData').value;
+                ticketManager.loadNewTickets(ticketData);
+            });
+            
+            document.getElementById('mergeTickets').addEventListener('click', () => {
+                const ticketData = document.getElementById('ticketData').value;
+                ticketManager.mergeTickets(ticketData);
+            });
+            
+            document.getElementById('exportTickets').addEventListener('click', () => {
+                ticketManager.exportTickets();
+            });
+            
+            document.getElementById('clearStorage').addEventListener('click', () => {
+                if (confirm('Are you sure you want to clear ALL ticket data and scan history? This cannot be undone.')) {
+                    storageManager.clearAllData();
+                    ticketManager.tickets = [];
+                    ticketManager.scanHistory = [];
+                    ticketManager.updateStats();
+                    ticketManager.renderScanHistory();
+                    
+                    const resultElement = document.getElementById('validationResult');
+                    resultElement.className = 'validation-result status-idle';
+                    document.getElementById('resultIcon').textContent = '📱';
+                    document.getElementById('resultText').textContent = 'Ready to Scan';
+                    document.getElementById('resultSubtext').textContent = 'Point camera at QR code to validate ticket';
+                    document.getElementById('ticketDetails').style.display = 'none';
+                }
+            });
+        }
+        
+        function loadExampleData() {
+            const exampleData = `12/28/2025 21:55:39\tJacob Michelo\tjcbmichelo@gmail.com\t0979140681\tDouble : 2 people [ k600]\t1\tNOL-1766951741348\t600\tFAMILY MATAZ & a short story\t19:30\tFebruary 14, 2026.\tMKANGO GOLF VIEW
+12/29/2025 10:15:22\tSarah Johnson\tsarahj@example.com\t0978123456\tSingle : 1 person [ k300]\t1\tNOL-1766951741350\t300\tFAMILY MATAZ & a short story\t19:30\tFebruary 14, 2026.\tMKANGO GOLF VIEW
+12/29/2025 11:30:45\tMichael Brown\tmichaelb@example.com\t0978345678\tVIP : 4 people [ k1200]\t1\tNOL-1766951741352\t1200\tFAMILY MATAZ & a short story\t19:30\tFebruary 14, 2026.\tMKANGO GOLF VIEW`;
+            
+            document.getElementById('ticketData').value = exampleData;
+        }
+    </script>
 </body>
-  </html>
+</html>
